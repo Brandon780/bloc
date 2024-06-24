@@ -1,0 +1,131 @@
+Descomponer una fórmula compleja en partes más simples y manejables es una excelente estrategia para entender mejor cada componente y facilitar su depuración y mantenimiento. Aquí te mostraré cómo hacerlo paso a paso, utilizando la fórmula de Access para calcular las primas devengadas. Luego, combinaremos estos pasos en una fórmula final en Excel.
+
+### Paso 1: Entender la Fórmula Compleja
+
+La fórmula original en Access realiza las siguientes acciones:
+
+1. **Verifica si la prima total es 0**.
+2. **Calcula los días devengados** en el periodo fiscal según la intersección de fechas.
+3. **Calcula la proporción devengada**.
+4. **Devuelve el valor de la prima devengada**.
+
+### Paso 2: Dividir la Fórmula en Partes Más Simples
+
+#### 2.1. Verificar si la Prima Total es 0
+
+```excel
+=SI(C2=0; 0; ...)
+```
+
+Esta parte de la fórmula verifica si la `PRIMA_TOTAL` (en la columna `C`) es igual a 0. Si es 0, el resultado de la fórmula será 0. Si no, la fórmula continua con la siguiente parte.
+
+#### 2.2. Definir las Fechas de Inicio y Fin del Periodo Fiscal
+
+Colocamos estas fechas en celdas fijas para referenciarlas fácilmente:
+
+- **`D1`**: `FECHA_INI` del periodo fiscal (por ejemplo, `01/07/2022`).
+- **`E1`**: `FECHA_FIN` del periodo fiscal (por ejemplo, `30/06/2023`).
+
+#### 2.3. Calcular los Días Devengados
+
+Dividiremos este cálculo en partes:
+
+- **Inicio de la Intersección**:
+  
+  ```excel
+  =MAX(A2; $D$1)
+  ```
+  
+  Esto obtiene la fecha mayor entre la fecha de inicio de la vigencia (`FEC_VIG_DESDE`, en la columna `A`) y la `FECHA_INI` del periodo fiscal.
+
+- **Fin de la Intersección**:
+  
+  ```excel
+  =MIN(B2; $E$1)
+  ```
+  
+  Esto obtiene la fecha menor entre la fecha de fin de la vigencia (`FEC_VIG_HASTA`, en la columna `B`) y la `FECHA_FIN` del periodo fiscal.
+
+- **Días de Intersección**:
+  
+  ```excel
+  =SI(MAX(A2; $D$1) <= MIN(B2; $E$1); MIN(B2; $E$1) - MAX(A2; $D$1) + 1; 0)
+  ```
+
+  Esta fórmula calcula el número de días de intersección entre las dos fechas, considerando que solo se cuenta si las fechas se superponen.
+
+#### 2.4. Calcular los Días Totales de la Vigencia
+
+```excel
+=B2 - A2 + 1
+```
+
+Esta fórmula calcula el número total de días de la vigencia de la póliza.
+
+#### 2.5. Calcular la Proporción Devengada
+
+```excel
+=F2 / G2
+```
+
+Donde `F2` es el número de días devengados y `G2` es el número de días totales de la vigencia.
+
+#### 2.6. Calcular la Prima Devengada
+
+```excel
+=C2 * H2
+```
+
+Donde `C2` es la `PRIMA_TOTAL` y `H2` es la proporción devengada.
+
+### Paso 3: Implementar las Partes en Excel
+
+1. **Crear Columnas para Cada Paso**:
+
+| Columna | Nombre               | Fórmula                                                                 |
+|---------|----------------------|-------------------------------------------------------------------------|
+| `A`     | `FEC_VIG_DESDE`      | -                                                                       |
+| `B`     | `FEC_VIG_HASTA`      | -                                                                       |
+| `C`     | `PRIMA_TOTAL`        | -                                                                       |
+| `D`     | `FECHA_INI`          | `01/07/2022` (dato manual)                                              |
+| `E`     | `FECHA_FIN`          | `30/06/2023` (dato manual)                                              |
+| `F`     | `INTERSECCION_INI`   | `=MAX(A2; $D$1)`                                                        |
+| `G`     | `INTERSECCION_FIN`   | `=MIN(B2; $E$1)`                                                        |
+| `H`     | `DIAS_INTERSECCION`  | `=SI(MAX(A2; $D$1) <= MIN(B2; $E$1); MIN(B2; $E$1) - MAX(A2; $D$1) + 1; 0)` |
+| `I`     | `DIAS_VIGENCIA`      | `=B2 - A2 + 1`                                                          |
+| `J`     | `PROPORCION_DEV`     | `=H2 / I2`                                                              |
+| `K`     | `PRIMA_DEVENGADA`    | `=C2 * J2`                                                              |
+
+2. **Ingresar las Fórmulas en Cada Columna**:
+   - En la columna `F`, celda `F2`, ingresa: `=MAX(A2; $D$1)`.
+   - En la columna `G`, celda `G2`, ingresa: `=MIN(B2; $E$1)`.
+   - En la columna `H`, celda `H2`, ingresa: `=SI(MAX(A2; $D$1) <= MIN(B2; $E$1); MIN(B2; $E$1) - MAX(A2; $D$1) + 1; 0)`.
+   - En la columna `I`, celda `I2`, ingresa: `=B2 - A2 + 1`.
+   - En la columna `J`, celda `J2`, ingresa: `=H2 / I2`.
+   - En la columna `K`, celda `K2`, ingresa: `=C2 * J2`.
+
+3. **Arrastrar las Fórmulas Hacia Abajo**:
+   - Selecciona cada celda con fórmula y arrástrala hacia abajo para aplicarla a todas las filas de datos.
+
+### Paso 4: Crear la Fórmula Final en una Celda
+
+Para tener una fórmula final en una sola celda sin necesidad de crear columnas intermedias, puedes combinar las fórmulas paso a paso en una única fórmula. La fórmula completa sería:
+
+```excel
+=SI(C2=0; 0;
+  C2 * 
+  SI(
+    MAX(A2; $D$1) <= MIN(B2; $E$1);
+    (MIN(B2; $E$1) - MAX(A2; $D$1) + 1) / (B2 - A2 + 1);
+    0
+  )
+)
+```
+
+Esta fórmula comprueba si la prima total es 0, y si no lo es, calcula la proporción devengada en función de la intersección de fechas y los días totales de la vigencia.
+
+**Nota**: Asegúrate de ajustar los formatos de celda a "Fecha" para las fechas y a "Número" para los cálculos de días y primas.
+
+### Resultado Final
+
+Ahora tienes una fórmula completa y un conjunto de pasos simplificados para calcular las primas devengadas en Excel. Cada componente de la fórmula se descompone para facilitar la comprensión y depuración. Puedes adaptar y ajustar estas fórmulas según necesites para otras configuraciones o periodos fiscales.

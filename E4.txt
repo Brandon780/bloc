@@ -1,0 +1,65 @@
+La fórmula `=SI(MAX(A2; $D$1) <= MIN(B2; $E$1); MIN(B2; $E$1) - MAX(A2; $D$1) + 1; 0)` que se ubica en la columna `H` devuelve el número de días devengados de la prima en el periodo fiscal especificado. A continuación, descompondremos la fórmula para entender mejor cada uno de sus componentes y su funcionamiento:
+
+### Descomposición de la Fórmula
+
+1. **`MAX(A2; $D$1)`**:
+   - Esta función toma el valor máximo entre la fecha de inicio de vigencia (`A2`) y la fecha de inicio del periodo fiscal (`$D$1`).
+   - Esto significa que la fecha de inicio para contar los días devengados será la más reciente de las dos fechas, asegurando que no se cuenten días fuera del periodo fiscal.
+
+2. **`MIN(B2; $E$1)`**:
+   - Esta función toma el valor mínimo entre la fecha de fin de vigencia (`B2`) y la fecha de fin del periodo fiscal (`$E$1`).
+   - Esto asegura que la fecha de fin para contar los días devengados será la más temprana de las dos fechas, evitando contar días fuera del periodo fiscal.
+
+3. **`MAX(A2; $D$1) <= MIN(B2; $E$1)`**:
+   - Esta comparación verifica si el intervalo calculado tiene sentido lógico, es decir, si la fecha de inicio de la intersección es menor o igual a la fecha de fin de la intersección.
+   - Si esto es verdadero, significa que hay una superposición válida de fechas entre la vigencia de la póliza y el periodo fiscal.
+
+4. **`MIN(B2; $E$1) - MAX(A2; $D$1) + 1`**:
+   - Esta parte de la fórmula calcula el número de días de intersección entre la vigencia de la póliza y el periodo fiscal.
+   - Al restar la fecha de inicio de la intersección de la fecha de fin de la intersección y sumarle 1, obtenemos el número de días incluidos en este periodo.
+
+5. **`SI(...; ...; 0)`**:
+   - La función `SI` evalúa la condición. Si la condición es verdadera (`MAX(A2; $D$1) <= MIN(B2; $E$1)`), devuelve el número de días de intersección calculados.
+   - Si la condición es falsa, significa que no hay una superposición válida de fechas y devuelve `0`.
+
+### Ejemplo Práctico
+
+Supongamos los siguientes valores en las celdas:
+
+- `A2`: `15/06/2023` (Fecha de inicio de vigencia)
+- `B2`: `15/08/2023` (Fecha de fin de vigencia)
+- `D1`: `01/07/2023` (Inicio del periodo fiscal)
+- `E1`: `30/06/2024` (Fin del periodo fiscal)
+
+Aplicando la fórmula:
+
+1. **`MAX(A2; $D$1)`**: `MAX(15/06/2023; 01/07/2023)` = `01/07/2023`
+2. **`MIN(B2; $E$1)`**: `MIN(15/08/2023; 30/06/2024)` = `15/08/2023`
+3. **Condición**: `01/07/2023 <= 15/08/2023` (Verdadero)
+4. **Días de Intersección**: `15/08/2023 - 01/07/2023 + 1` = `46 días`
+
+Por lo tanto, la fórmula devuelve `46`, indicando que hay 46 días de vigencia de la póliza dentro del periodo fiscal.
+
+### Visualización en Excel
+
+Para visualizar cómo esta fórmula trabaja con diferentes datos:
+
+1. **Ejemplo en Excel**:
+
+| FEC_VIG_DESDE | FEC_VIG_HASTA | FECHA_INI  | FECHA_FIN  | DÍAS_INTERSECCIÓN |
+|---------------|---------------|------------|------------|-------------------|
+| 15/06/2023    | 15/08/2023    | 01/07/2023 | 30/06/2024 | 46                |
+
+2. **Otro Ejemplo con Diferentes Fechas**:
+
+| FEC_VIG_DESDE | FEC_VIG_HASTA | FECHA_INI  | FECHA_FIN  | DÍAS_INTERSECCIÓN |
+|---------------|---------------|------------|------------|-------------------|
+| 01/06/2022    | 30/06/2023    | 01/07/2023 | 30/06/2024 | 0                 |
+
+En este caso, la fórmula devuelve `0` porque no hay intersección entre las fechas de vigencia y el periodo fiscal.
+
+### Interpretación de la Columna `H`
+
+La columna `H` muestra el número de días en que la póliza está vigente durante el periodo fiscal definido por las fechas en `D1` y `E1`. Esta información es crucial para calcular cuánto de la prima total debe ser devengada dentro del periodo fiscal.
+
+Si necesitas implementar y ajustar la fórmula para un análisis específico o si necesitas más ejemplos, no dudes en preguntar.
